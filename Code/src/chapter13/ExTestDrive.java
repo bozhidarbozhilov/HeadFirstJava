@@ -14,6 +14,7 @@ public class ExTestDrive {
         }finally {
             System.out.print("w");
             System.out.print("s");
+            System.out.println("!");
         }
     }
 
