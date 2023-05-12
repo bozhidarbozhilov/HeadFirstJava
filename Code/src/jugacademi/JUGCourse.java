@@ -1,4 +1,4 @@
-package experiments;
+package jugacademi;
 
 import java.util.HashMap;
 import java.util.Map;
