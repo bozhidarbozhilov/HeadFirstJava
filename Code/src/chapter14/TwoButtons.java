@@ -21,8 +21,8 @@ public class TwoButtons {
         JButton labelButton = new JButton("Change label");
         label = new JLabel("I'm a label");
 
-        colorButton.addActionListener(new ColorListener());
-        labelButton.addActionListener(new LabelListener());
+        colorButton.addActionListener(event -> frame.repaint());
+        labelButton.addActionListener(event -> label.setText("Ouch"));
         MyDrawPanel drawPanel = new MyDrawPanel();
 
         frame.getContentPane().add(BorderLayout.SOUTH, colorButton);
@@ -31,18 +31,5 @@ public class TwoButtons {
         frame.getContentPane().add(BorderLayout.CENTER, drawPanel);
         frame.setSize(500,500);
         frame.setVisible(true);
-    }
-    class LabelListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            label.setText("Ouch");
-        }
-    }
-    class ColorListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            frame.repaint();
-        }
     }
 }
