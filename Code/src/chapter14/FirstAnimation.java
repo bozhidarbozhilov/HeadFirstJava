@@ -40,6 +40,8 @@ public class FirstAnimation {
     class AnimationDraw extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
+            g.setColor(Color.WHITE);
+            g.fillRect(0,0, this.getWidth(),this.getHeight());
             g.setColor(Color.BLUE);
             g.fillOval(x,y,30,30);
         }
