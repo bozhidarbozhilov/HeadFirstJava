@@ -24,7 +24,8 @@ public class FirstAnimation {
         frame.setSize(400,400);
         frame.setVisible(true);
         while(x<=100){
-            ad.repaint();
+            frame.repaint();
+            //ad.repaint();
             x += ANIMATION_STEP;
             y += ANIMATION_STEP;
             try{
