@@ -27,14 +27,18 @@ public class User implements java.io.Serializable, java.lang.Cloneable {
     }
 
     public void setDetails(Object details) {
+
         this.details = details;
     }
 
     @Override
     protected Object clone() throws java.lang.CloneNotSupportedException {
         User cloned = (User) super.clone();
-
-        cloned.setDetails(new Object());
+        if(!(this.details instanceof java.lang.Cloneable)){
+            throw new java.lang.CloneNotSupportedException();
+        }else{
+            cloned.setDetails(this.details);
+        }
 
         return cloned;
     }

@@ -2,6 +2,10 @@ package jugacademi.api;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -10,12 +14,42 @@ import java.util.stream.Stream;
 public class Test {
 
     public static void main(String[] args) throws IOException {
-        java.util.stream.Stream<FibNumber> stream = fib();
-        java.util.Iterator<FibNumber> iterator = stream.iterator();
-        for(int i = 0; i < 29; i++ ) {
-            iterator.next();
+
+    }
+
+    public String getArticle(String title) {
+        java.lang.StringBuffer result= new java.lang.StringBuffer();
+        try{
+            java.net.URL url = new java.net.URL("https://en.wikipedia.org/api/rest_v1/page/html/" + title);
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if(responseCode==java.net.HttpURLConnection.HTTP_OK){
+                java.io.BufferedReader res = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(connection.getInputStream())
+                );
+                String line;
+                while((line = res.readLine())!= null){
+                    result.append(line);
+                }
+                res.close();
+            }
+        }catch (java.io.IOException ex){
+            ex.printStackTrace();
         }
-        System.out.println(iterator.next().getCurrent().intValue());
+        return result.toString();
+    }
+
+    public long matrixSum(){
+        java.util.Scanner scanner = new java.util.Scanner(java.lang.System.in);
+        long result=0l;
+        String line;
+        for (int i = 0; i < 4; i++) {
+            line = scanner.nextLine();
+            long lineSum = java.util.Arrays.stream(line.split("\\s")).mapToLong(Long::parseLong).sum();
+            result += lineSum;
+        }
+        return result;
     }
 
     public java.util.function.Function<Integer, java.math.BigInteger> degree(int n){
