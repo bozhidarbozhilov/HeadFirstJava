@@ -3,6 +3,7 @@ package chapter15;
 import javax.sound.midi.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 
 import static javax.sound.midi.ShortMessage.*;
@@ -16,7 +17,7 @@ public class BeatBox {
 
     //Names of the instruments
     String[] instrumentsNames = {"Bass Drum", "Closed Hi-Hat", "Open Hi-Hat", "Acoustic Snare", "Crash Cymbal",
-            "Hand Clap", "High Tom", "Hi Bongo", "Maracas", "Whistle","Low Conga", "Cowbell", "Vibraslap", "Low-mid Tom",
+            "Hand Clap", "High Tom", "Hi Bongo", "Maracas", "Whistle", "Low Conga", "Cowbell", "Vibraslap", "Low-mid Tom",
             "High Agogo", "Open High Conga"};
 
     //Drum channelss
@@ -36,23 +37,31 @@ public class BeatBox {
         Box buttonBox = new Box(BoxLayout.Y_AXIS);
 
         JButton start = new JButton("Start");
-        start.addActionListener(e->buildTrackAndStart());
+        start.addActionListener(e -> buildTrackAndStart());
         buttonBox.add(start);
 
         JButton stop = new JButton("Stop");
-        stop.addActionListener(e->sequencer.stop());
+        stop.addActionListener(e -> sequencer.stop());
         buttonBox.add(stop);
 
         JButton upTempo = new JButton("Tempo Up");
-        upTempo.addActionListener(e->changeTempo(1.03f));
+        upTempo.addActionListener(e -> changeTempo(1.03f));
         buttonBox.add(upTempo);
 
         JButton downTempo = new JButton("Tempo Down");
         downTempo.addActionListener(e -> changeTempo(0.97f));
         buttonBox.add(downTempo);
 
+        JButton serializeBtn = new JButton("Serialize It");
+        serializeBtn.addActionListener(e->writeFile());
+        buttonBox.add(serializeBtn);
+
+        JButton restoreBtn = new JButton("Restore");
+        restoreBtn.addActionListener(e->readFile());
+        buttonBox.add(restoreBtn);
+
         Box nameBox = new Box(BoxLayout.Y_AXIS);
-        for(String instrumentName: instrumentsNames){
+        for (String instrumentName : instrumentsNames) {
             JLabel instrumentLabel = new JLabel(instrumentName);
             instrumentLabel.setBorder(BorderFactory.createEmptyBorder(4, 1, 4, 1));
             nameBox.add(instrumentLabel);
@@ -70,7 +79,7 @@ public class BeatBox {
         background.add(BorderLayout.CENTER, mainPanel);
 
         checkBoxList = new ArrayList<>();
-        for(int i = 0; i<256; i++){
+        for (int i = 0; i < 256; i++) {
             JCheckBox c = new JCheckBox();
             c.setSelected(false);
             checkBoxList.add(c);
@@ -79,14 +88,14 @@ public class BeatBox {
 
         setUpMidi();
 
-        frame.setBounds(50,50,300,300);
+        frame.setBounds(50, 50, 300, 300);
         frame.pack();
         frame.setVisible(true);
 
     }
 
     private void setUpMidi() {
-        try{
+        try {
             sequencer = MidiSystem.getSequencer();
             sequencer.open();
             sequence = new Sequence(Sequence.PPQ, 4);
@@ -113,35 +122,35 @@ public class BeatBox {
             trackList = new int[16];
             int key = instruments[i];
             for (int j = 0; j < 16; j++) {
-                JCheckBox jc = checkBoxList.get(j+16*i);
+                JCheckBox jc = checkBoxList.get(j + 16 * i);
                 if (jc.isSelected()) {
                     trackList[j] = key;
-                }else{
+                } else {
                     trackList[j] = 0;
                 }
             }
             makeTracks(trackList);
             track.add(makeEvent(CONTROL_CHANGE, 1, 127, 0, 16));
         }
-        track.add(makeEvent(CONTROL_CHANGE,1, 127,0,16));
+        track.add(makeEvent(CONTROL_CHANGE, 1, 127, 0, 16));
 
-        try{
+        try {
             sequencer.setSequence(sequence);
             sequencer.setLoopCount(sequencer.LOOP_CONTINUOUSLY);
             sequencer.setTempoInBPM(120);
             sequencer.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static MidiEvent makeEvent(int cmd, int chnl, int one, int two, int tick) {
         MidiEvent event = null;
-        try{
+        try {
             ShortMessage msg = new ShortMessage();
             msg.setMessage(cmd, chnl, one, two);
             event = new MidiEvent(msg, tick);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return event;
@@ -152,10 +161,42 @@ public class BeatBox {
             int key = list[i];
 
             if (key != 0) {
-                track.add(makeEvent(NOTE_ON,9, key, 100, i));
-                track.add(makeEvent(NOTE_OFF,9, key, 100, i+1));
+                track.add(makeEvent(NOTE_ON, 9, key, 100, i));
+                track.add(makeEvent(NOTE_OFF, 9, key, 100, i + 1));
             }
         }
+    }
+
+    private void writeFile() {
+        boolean[] checkboxState = new boolean[256];
+        for (int i = 0; i < 256; i++) {
+            JCheckBox check = checkBoxList.get(i);
+            if (check.isSelected()) {
+                checkboxState[i] = true;
+            }
+        }
+
+        try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream("Checkbox.ser"))) {
+            os.writeObject(checkboxState);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readFile() {
+        boolean[] checkboxState = null;
+        try (ObjectInputStream is = new ObjectInputStream(new FileInputStream("Checkbox.ser"))) {
+            checkboxState = (boolean[]) is.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < 256; i++) {
+            JCheckBox check = checkBoxList.get(i);
+            check.setSelected(checkboxState[i]);
+        }
+        sequencer.stop();
+        buildTrackAndStart();
     }
 
 }
