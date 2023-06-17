@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 public class DailyAdviceClient {
     public void go(){
-        InetSocketAddress serverAddr = new InetSocketAddress("127.0.0.1", 5000);
+        InetSocketAddress serverAddr = new InetSocketAddress("127.0.0.1", 5050);
         try(SocketChannel socketChannel = SocketChannel.open(serverAddr)){
             Reader channelReader = Channels.newReader(socketChannel, StandardCharsets.UTF_8);
             BufferedReader reader = new BufferedReader(channelReader);
